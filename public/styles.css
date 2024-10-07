@@ -13,7 +13,7 @@ body {
 
 .container {
     background-color: #FFF9E6; 
-    border: 3px solid black;
+    border: 9px solid black;
     border-radius: 10px;
     padding: 20px;
 }
@@ -104,24 +104,8 @@ body {
     padding-top: 60px;
 }
 
-.modal-content {
-    background-color: #FFF9E6;
-    margin: 5% auto;
-    padding: 20px;
-    border: 1px solid #333;
-    width: 80%;
-    border-radius: 10px;
-}
 
-.modal-footer button {
-    background-color: #A7C7E7;
-    border: none;
-}
 
-.modal-footer button:hover {
-    background-color: #7D5A50;
-    color: #FFF9E6;
-}
 
 .close {
     color: #333;

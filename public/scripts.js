@@ -90,6 +90,7 @@ const calendars = {}; // Store calendar instances for each category
 document.querySelectorAll(".save-to-calendar-btn").forEach((button) => {
   button.addEventListener("click", function () {
     const category = this.getAttribute("data-category");
+    handleFormSubmit(event, category); 
 
     // Use one shared calendar container
     let calendarContainer = this.nextElementSibling;
@@ -97,7 +98,7 @@ document.querySelectorAll(".save-to-calendar-btn").forEach((button) => {
       calendarContainer = document.createElement("div");
       calendarContainer.classList.add("calendar-container");
       calendarContainer.innerHTML = `
-        <h4>Select a Date to Save This ${category.charAt(0).toUpperCase() + category.slice(1)} Note:</h4>
+        <h4>Select a Date </h4>
         <div id="calendar-${category}"></div>`;
       this.parentNode.appendChild(calendarContainer);
     }
@@ -148,7 +149,6 @@ function initializeCalendar(calendarId, category) {
   return calendar;
 }
 
-// Function to handle form submission (save the note)
 function handleFormSubmit(event, category) {
   event.preventDefault(); // Prevent default form submission
 
@@ -197,24 +197,7 @@ function handleFormSubmit(event, category) {
       saveMessage.innerText = "Note saved successfully!";
       console.log("Note saved:", data);
 
-      // Add the event to the calendar
-      if (selectedDate) {
-        const calendar = calendars[category];
-        if (calendar) {
-          calendar.addEvent({
-            title: data.title,
-            start: selectedDate, // Display the saved note on the calendar at the selected date
-            allDay: true,
-          });
-        }
-      }
-
-      const makeAnotherNote = confirm("Note Saved! Click OK to make another note. Click Cancel to Exit.");
-      if (makeAnotherNote) {
-        resetToInitialScreen();
-      } else {
-        exitApp();
-      }
+      askMakeAnotherNote(); // Prompt user to make another note or leave the app
     })
     .catch(error => {
       console.error("Error:", error);
@@ -222,138 +205,45 @@ function handleFormSubmit(event, category) {
     });
 }
 
-// Function to clear the form when the discard button is clicked
- function discardForm(category) {
-  const userConfirmed = confirm(
-          "Are you sure you want to erase the content of this note?"
-      );
-
-  if (userConfirmed) {
-    // Get the form element based on the category and reset its fields
-    const form = document.getElementById(`${category}FormElement`); // Target the correct form ID
-
-    if (form) {
-      form.reset(); // Reset the form fields
-    }
-
-    // Clear any save message, if displayed
-    const saveMessage = document.getElementById("saveMessage");
-    if (saveMessage) {
-      saveMessage.innerText = "";
-    }
-
-    // Hide all forms after the discard action
-    const forms = document.querySelectorAll(".dropdown-container");
-    forms.forEach((form) => (form.style.display = "none")); // Hide all forms
-
-    // Do not click any tab, leave no form visible
-    console.log("Form discarded, all forms hidden");
-  } else {
-    console.log("Discard action canceled");
-  }
-}
-
-function handleFormSubmit(event, category) {
-  event.preventDefault(); // Prevent default form submission
-
-  let title, content;
-  if (category === "grocery" || category === "todo") {
-    title = document.getElementById(`${category}ListTitle`).value;
-    content = Array.from(document.querySelectorAll(`#${category}Items input[type="text"]`))
-                   .map(item => item.value).join(", ");
-  } else if (category === "general") {
-    title = document.getElementById("generalNoteTitle").value;
-    content = document.getElementById("generalNoteContent").value;
-  }
-
-  const selectedDate = document
-    .getElementById(`${category}Form`)
-    .getAttribute("data-selected-date");
-
-  // Ensure title and content are not empty
-  if (!title || !content) {
-    alert("Please provide both title and content.");
-    return;
-  }
-
-  // Create the note object once
-  const note = {
-    title,
-    content,
-    category,
-    createdAt: selectedDate || new Date().toISOString(), // Use selected date if available
-  };
-
-  const saveMessage = document.getElementById("saveMessage");
-
-  // Send the note to the backend
-  fetch('http://127.0.0.1:5001/api/notes', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(note),
-  })
+function askMakeAnotherNote() {
+  const makeAnotherNote = confirm("Would you like to make another note?");
   
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Error saving note");
-      }
-      return response.json();
-    })
-    .then(data => {
-      saveMessage.innerText = "Note saved successfully!";
-      console.log("Note saved:", data);
-
-      // Add the event to the calendar if a date is selected
-      if (selectedDate) {
-        const calendar = FullCalendar.getCalendarById(`calendar-${category}`);
-        calendar.addEvent({
-          title: data.title,
-          start: selectedDate,
-        });
-      }
-
-      const makeAnotherNote = confirm("Note Saved! Click OK to make another note. Click Cancel to Exit.");
-      if (makeAnotherNote) {
-        resetToInitialScreen();
-      } else {
-        exitApp();
-      }
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      saveMessage.innerText = "Error saving the note.";
-    });
+  if (makeAnotherNote) {
+    resetToInitialScreen(); // Reset the form and start from scratch
+  } else {
+    askLeaveNotaBene(); // Ask if they want to leave
+  }
 }
 
+function askLeaveNotaBene() {
+  const leaveApp = confirm("Would you like to leave NotaBene?");
+  
+  if (leaveApp) {
+    exitApp(); // Show goodbye message and exit the app
+  } else {
+    resetToInitialScreen(); // Reset the form and return to the start
+  }
+}
 
-
-// Function to reset all forms and return to the initial screen (no forms visible)
 function resetToInitialScreen() {
-  // Hide all forms
   const formContainers = document.querySelectorAll(".dropdown-container");
-  formContainers.forEach((form) => (form.style.display = "none")); // Hide all forms
+  formContainers.forEach((form) => (form.style.display = "none"));
 
-  // Clear any save message
+  const inputs = document.querySelectorAll("input, textarea");
+  inputs.forEach(input => input.value = "");
+
   const saveMessage = document.getElementById("saveMessage");
   if (saveMessage) {
     saveMessage.innerText = "";
   }
 
-  console.log("Reset to initial screen, no forms visible.");
+  const initialOptions = document.querySelectorAll(".file-folder-tab");
+  initialOptions.forEach((tab) => (tab.style.display = "block"));
+
+  console.log("Reset to initial screen, no forms visible, tabs displayed.");
 }
 
-
-// Function to exit the app and display a blank screen with a goodbye message
 function exitApp() {
-  const userConfirmed = confirm("Are you sure you want to leave this app?");
-  if (userConfirmed) {
-    // Clear the entire content of the body and show a goodbye message
-    document.body.innerHTML =
-      '<div style="text-align:center; font-size:24px; margin-top:20%;">Goodbye</div>';
-    console.log("User has exited the app");
-  } else {
-    console.log("Exit action canceled");
-  }
+  document.body.innerHTML = '<div style="text-align:center; font-size:24px; margin-top:20%;">Goodbye</div>';
+  console.log("User has exited the app");
 }
