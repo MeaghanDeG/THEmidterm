@@ -2,36 +2,38 @@ const express = require('express');
 const router = express.Router();
 const Note = require('../models/Note'); // Assuming you have a Note model
 
-// Route to create a new note
+
 router.post('/', async (req, res) => {
-    try {
-      // Validate the required fields before creating the note
-      const { title, content, category, createdAt } = req.body;
-      
-      if (!title || !content) {
-        return res.status(400).json({ message: "Title and content are required." });
-      }
-  
-      // Create a new note using the request body
-      const note = new Note({
-        title,
-        content,
-        category: category || 'General', // If no category is provided, default to 'General'
-        createdAt: createdAt || new Date(), // Use provided creation date or default to now
-      });
-  
-      // Save the note to the database
-      const savedNote = await note.save();
-      
-      // Send back the saved note with a 201 status
-      res.status(201).json(savedNote);
-  
-    } catch (err) {
-      // Handle any errors that occur during the process
-      res.status(500).json({ message: err.message });
+  try {
+    // Validate the required fields before creating the note
+    const { title, content, category, createdAt, calendarDate } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({ message: "Title and content are required." });
     }
-  });
-  
+
+    // Create the note object with defaults for optional fields
+    const newNote = new Note({
+      title,
+      content,
+      category: category || 'General', // Default to 'General' if no category is provided
+      createdAt: createdAt || Date.now(), 
+      calendarDate: calendarDate ? new Date(calendarDate) : null 
+    });
+
+    // Save the note to the database
+    const savedNote = await newNote.save();
+    res.status(201).json({
+      message: 'Note saved successfully!',
+      note: savedNote,
+    });
+
+  } catch (error) {
+    console.error('Error saving note:', error);
+    res.status(500).json({ error: 'Failed to save the note' });
+  }
+});
+
 
 /// GET all notes
 router.get('/', async (req, res) => {
@@ -39,7 +41,7 @@ router.get('/', async (req, res) => {
       const notes = await Note.find(); // Fetch all notes from the database
       res.status(200).json(notes); // Send the list of notes back to the client
     } catch (err) {
-      res.status(500).json({ message: err.message }); // Internal Server Error
+      res.status(500).json({ message: 'Failed to fetch notes'}); // Internal Server Error
     }
   });
   
@@ -52,9 +54,40 @@ router.get('/', async (req, res) => {
       }
       res.status(200).json(note); // Send the note back to the client
     } catch (err) {
-      res.status(500).json({ message: err.message }); // Internal Server Error
+      res.status(500).json({ message: 'Failed to fetch the note'  }); // Internal Server Error
     }
   });
+
+  // PUT route to update an existing note by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const { title, content, category, calendarDate } = req.body;
+
+    const updatedNote = await Note.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        content,
+        category: category || 'General',
+        calendarDate: calendarDate || null,
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedNote) {
+      return res.status(404).json({ message: 'Note not found' });
+    }
+
+    res.status(200).json({
+      message: 'Note updated successfully!',
+      note: updatedNote,
+    });
+  } catch (error) {
+    console.error('Error updating note:', error);
+    res.status(500).json({ message: 'Failed to update the note' });
+  }
+});
+
 
   router.delete('/:id', async (req, res) => {
     console.log('DELETE request received for note with ID:', req.params.id);
