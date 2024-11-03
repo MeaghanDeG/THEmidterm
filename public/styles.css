@@ -1,30 +1,42 @@
-.dropdown-container {
-    display: none; /* Hide all forms by default */
+/* Primary color variables for easy tweaking */
+:root {
+    --dark-blue: #0b0a24;       /* Background color */
+    --light-blue: #A7C7E7;      /* Accent button color */
+    --cream: #FFF9E6;           /* Light cream background */
+    --deep-blue: #39506b;       /* Tag color */
+    --dark-purple: #4b0082;     /* Tag color */
+    --light-gray: #eff0f9;      /* General text color */
+    --hover-brown: #9298b0;     /* Button hover color */
 }
 
-
-body {
-    background-color: #FFF9E6; 
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    color: #333;
-}
-
-.container {
-    background-color: #FFF9E6; 
-    border: 9px solid black;
-    border-radius: 10px;
-    padding: 20px;
-}
+/* Hides all forms by default */
 .dropdown-container {
     display: none;
 }
 
-.page-border {
-    border: 3px solid #333; 
+/* Body styling */
+body {
+    background-color: var(--dark-blue); 
+    font-family: "Outfit", sans-serif;
+    margin: 0;
+    padding: 0;
+    color: var(--light-blue);
 }
 
+/* Container style */
+.container {
+    background-color: #474a54;
+    border: 9px solid var(--light-gray);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* Border for the page */
+.page-border {
+    border: 3px solid #333;
+}
+
+/* Header image style */
 .header img {
     width: 100%;
     max-width: 100%;
@@ -32,6 +44,7 @@ body {
     aspect-ratio: 16/9;
 }
 
+/* File folder tab styling */
 .file-folder-tabs-container {
     margin-bottom: 20px;
 }
@@ -40,28 +53,26 @@ body {
     padding: 10px;
     margin: 5px;
     cursor: pointer;
-    background-color: #7D5A50; 
-    color: #FFF9E6;
+    background-color: var(--light-blue);
+    color: var(--dark-blue);
     border-radius: 5px;
     text-align: center;
 }
 
 .file-folder-tab.active {
-    background-color: #A7C7E7; 
-    color: #333;
+    background-color: var(--deep-blue);
+    color: var(--light-gray);
 }
 
-.dropdown-container {
-    display: none;
-}
-
+/* Calendar content styling */
 .calendar-content {
     padding: 20px;
-    background-color: #FFF9E6;
+    background-color: var(--cream);
     border-radius: 10px;
     margin-top: 20px;
 }
 
+/* Color tag styling */
 .color-tags {
     display: flex;
     gap: 10px;
@@ -75,21 +86,28 @@ body {
     cursor: pointer;
 }
 
-.color-tag.deep-blue { background-color: #003f88; }
-.color-tag.dark-purple { background-color: #4b0082; }
-.color-tag.cream { background-color: #FFF9E6; }
+.color-tag.deep-blue { background-color: var(--deep-blue); }
+.color-tag.dark-purple { background-color: var(--dark-purple); }
+.color-tag.cream { background-color: var(--cream); }
 
+/* Button styling */
 .action-buttons button {
-    background-color: #A7C7E7;
+    background-color: var(--light-blue);
     border: none;
     margin-right: 10px;
+    color: var(--dark-blue);
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .action-buttons button:hover {
-    background-color: #7D5A50; 
-    color: #FFF9E6;
+    background-color: var(--hover-brown);
+    color: var(--cream);
 }
 
+/* Modal overlay */
 .modal {
     display: none;
     position: fixed;
@@ -99,14 +117,11 @@ body {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.4);
     padding-top: 60px;
 }
 
-
-
-
+/* Close button styling */
 .close {
     color: #333;
     float: right;
@@ -121,10 +136,12 @@ body {
     cursor: pointer;
 }
 
+/* Note card styling */
 .note-card {
     padding: 15px;
     margin-bottom: 10px;
-    background-color: #FFF9E6;
+    background-color: var(--cream);
     border: 1px solid #333;
     border-radius: 5px;
+    color: var(--dark-blue);
 }
